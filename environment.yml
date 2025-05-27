@@ -1,4 +1,4 @@
-name: test
+name: AGV_dash_app
 channels:
   - bioconda
   - r
@@ -6,4 +6,3 @@ channels:
   - defaults
 dependencies:
   - python=3.11
-prefix: /Users/cbrand/miniconda3/envs/test
