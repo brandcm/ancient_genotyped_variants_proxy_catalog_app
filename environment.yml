@@ -6,3 +6,7 @@ channels:
   - defaults
 dependencies:
   - python=3.11
+  - dash
+  - dash-bootstrap-components
+  - polars
+  - requests

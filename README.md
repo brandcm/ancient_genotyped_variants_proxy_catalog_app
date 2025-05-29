@@ -10,8 +10,6 @@ You can run this app in **three ways**:
 1. Docker  
 2. Python virtual environment (pip)  
 3. Conda environment
-
-Just clone this repo `git clone https://github.com/brandcm/ancient_genotyped_variants_proxy_catalog_app.git` and navigate to the repo on the command line.
 <br><br>
 
 ## 🐳 Docker
@@ -19,8 +17,9 @@ Just clone this repo `git clone https://github.com/brandcm/ancient_genotyped_var
 ### Build the image
 
 ```bash
+git clone https://github.com/brandcm/ancient_genotyped_variants_proxy_catalog_app.git
+cd ancient_genotyped_variants_proxy_catalog_app
 open -a "Docker" # start Docker
-cd ancient_genotyped_variants_proxy_catalog_app # navigate into app directory
 docker build -t agvs_dash_app . # build image
 ```
 
@@ -57,6 +56,8 @@ Then open your browser at [http://127.0.0.1:8050](http://127.0.0.1:8050).
 ### Create the environment
 
 ```bash
+git clone https://github.com/brandcm/ancient_genotyped_variants_proxy_catalog_app.git
+cd ancient_genotyped_variants_proxy_catalog_app
 conda env create -f environment.yml
 conda activate AGV_dash_app
 ```
