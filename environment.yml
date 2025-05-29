@@ -1,4 +1,4 @@
-name: AGV_dash_app
+name: AGVs_dash_app
 channels:
   - bioconda
   - r

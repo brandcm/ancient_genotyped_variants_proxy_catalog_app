@@ -59,13 +59,13 @@ Then open your browser at [http://127.0.0.1:8050](http://127.0.0.1:8050).
 git clone https://github.com/brandcm/ancient_genotyped_variants_proxy_catalog_app.git
 cd ancient_genotyped_variants_proxy_catalog_app
 conda env create -f environment.yml
-conda activate AGV_dash_app
+conda activate AGVs_dash_app
 ```
 
 ### Run the app
 
 ```bash
-python app.py
+python3 app.py
 ```
 
 Then open your browser at [http://127.0.0.1:8050](http://127.0.0.1:8050).

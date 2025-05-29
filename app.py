@@ -635,4 +635,4 @@ def compute_AF(df):
 	return AF, non_missing_GTs.height
 
 if __name__ == "__main__":
-	app.run_server(debug=False)
+	app.run(debug=False)
