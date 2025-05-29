@@ -18,13 +18,15 @@ Just clone this repo `git clone https://github.com/brandcm/ancient_genotyped_var
 ### Build the image
 
 ```bash
-docker build -t {image_name} .
+open -a "Docker" # start Docker
+cd ancient_genotyped_variants_proxy_catalog_app
+docker build -t AGVs_dash_app .
 ```
 
 ### Run the container
 
 ```bash
-docker run -p 8050:8050 {image_name}
+docker run -p 8050:80 AGVs_dash_app
 ```
 
 Then open your browser at [http://127.0.0.1:8050](http://127.0.0.1:8050).
