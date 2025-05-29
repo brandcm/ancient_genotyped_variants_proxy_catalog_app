@@ -1,6 +1,7 @@
 # 🧬 Ancient Genotyped Variants Proxy Catalog App
 
 This is a Dash web application for identifying ancient genotyped variants (AGVs) from the Allen Ancient DNA Resource (AADR) that occur in linkage disequilibrium (LD) with a variant of interest using data from TopLD.
+<br><br>
 
 ## 🚀 Quick Start
 
@@ -19,14 +20,14 @@ Just clone this repo `git clone https://github.com/brandcm/ancient_genotyped_var
 
 ```bash
 open -a "Docker" # start Docker
-cd ancient_genotyped_variants_proxy_catalog_app
-docker build -t AGVs_dash_app .
+cd ancient_genotyped_variants_proxy_catalog_app # navigate into app directory
+docker build -t agvs_dash_app . # build image
 ```
 
 ### Run the container
 
 ```bash
-docker run -p 8050:80 AGVs_dash_app
+docker run -p 8050:80 agvs_dash_app
 ```
 
 Then open your browser at [http://127.0.0.1:8050](http://127.0.0.1:8050).
