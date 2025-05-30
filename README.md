@@ -1,6 +1,7 @@
 # 🧬 Ancient Genotyped Variants Proxy Catalog App
 
 This repository features a tool that identifies ancient genotyped variants (AGVs) from the <a href="https://reich.hms.harvard.edu/allen-ancient-dna-resource-aadr-downloadable-genotypes-present-day-and-ancient-dna-data" target="_blank">Allen Ancient DNA Resource</a> or AADR that occur in linkage disequilibrium (LD) with a variant of interest using data from <a href="http://topld.genetics.unc.edu/" target="_blank">TopLD</a>. AGVs in LD with a variant of interest are displayed and the results can be downloaded. If a queried variant is an AGV itself, summary data are provided and users can also download the individual genotypes. Bulk data on variants in LD with AGVs can be downloaded <a href="https://ucsf.box.com/s/0fm9squ3qxofxnhn669jm2xm8w91qntg" target="_blank">here</a> and bulk data on ancient genotypes can be downloaded <a href="https://ucsf.box.com/s/9uhclcmqzyp9ftktkiaayi61n4lb3jxy" target="_blank">here</a>. Users can search for variants using genomic position per the GRCh38/hg38 reference assembly or rsID. Please note that each query may take one to two minutes. Questions or comments about this tool? Please email colin.brand@ucsf.edu or tony@capralab.org.
+<br><br>
 
 Notes:
 - Two measures of LD are available per variant pair: r-squared and D'.
