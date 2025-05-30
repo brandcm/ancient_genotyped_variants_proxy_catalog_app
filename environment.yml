@@ -8,5 +8,6 @@ dependencies:
   - python=3.11
   - dash
   - dash-bootstrap-components
+  - gunicorn
   - polars
   - requests

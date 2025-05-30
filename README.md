@@ -1,6 +1,6 @@
 # 🧬 Ancient Genotyped Variants Proxy Catalog App
 
-This is a Dash web application for identifying ancient genotyped variants (AGVs) from the Allen Ancient DNA Resource (AADR) that occur in linkage disequilibrium (LD) with a variant of interest using data from TopLD.
+This is a Dash web application for identifying ancient genotyped variants (AGVs) from the Allen Ancient DNA Resource (AADR) that occur in linkage disequilibrium (LD) with a variant of interest using data from TopLD. Note that querying most variants will take one to two minutes.
 <br><br>
 
 ## 🚀 Quick Start
@@ -45,7 +45,7 @@ pip install -r requirements.txt
 ### Run the app
 
 ```bash
-python app.py
+gunicorn app:server --bind 0.0.0.0:8050 --timeout 120
 ```
 
 Then open your browser at [http://127.0.0.1:8050](http://127.0.0.1:8050).
@@ -65,7 +65,7 @@ conda activate AGVs_dash_app
 ### Run the app
 
 ```bash
-python3 app.py
+gunicorn app:server --bind 0.0.0.0:8050 --timeout 120
 ```
 
 Then open your browser at [http://127.0.0.1:8050](http://127.0.0.1:8050).

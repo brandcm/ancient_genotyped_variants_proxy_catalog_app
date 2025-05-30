@@ -373,18 +373,19 @@ def query_AGVs(n_clicks, input_chr, input_pos, input_rsID):
 
 			if is_AGV:
 				if sorted_AGV_LDVs.height > 0:
-					message = (f"Variant {input_chr}:{input_pos} is an AGV. Summary results displayed below." if input_chr and input_pos else f"Variant {input_rsID} is an AGV. Summary results displayed below.")
+					message = (f"Variant {input_chr}:{input_pos} is an AGV and LD proxies were found. Both AGV summary results and LD proxies are displayed below." if input_chr and input_pos else f"Variant {input_rsID} is an AGV and LD proxies were found. Both AGV summary results and LD proxies are displayed below.")
 					return (message, {'display': 'block'}, {'display': 'block'}, AGV_data, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, archaic_GTs, {'display': 'block'}, {'display': 'block'}, AFs_summary, all_GTs, sorted_AGV_LDVs.to_dicts())
 				else:
-					message = f"Variant {input_chr}:{input_pos} is an AGV, but no LD proxies found." if input_chr and input_pos else f"Variant {input_rsID} is an AGV, but no LD proxies found."
+					message = f"Variant {input_chr}:{input_pos} is an AGV and summary results are displayed below. However, no LD proxies found." if input_chr and input_pos else f"Variant {input_rsID} is an AGV and summary results are displayed below. However, no LD proxies found."
 					return (message, {'display': 'block'}, {'display': 'block'}, AGV_data, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, archaic_GTs, {'display': 'block'}, {'display': 'block'}, AFs_summary, all_GTs, [])
 
 			else:
 				if sorted_AGV_LDVs.height > 0:
+					message = f"Variant {input_chr}:{input_pos} is not an AGV, but LD proxies were found and are displayed below." if input_chr and input_pos else f"Variant {input_rsID} is not an AGV, but LD proxies were found and are displayed below."
 					return ([], {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, [], [], sorted_AGV_LDVs.to_dicts())
 
 		except Exception as e:
-			return (f"An error occurred: {str(e)}", {'display': 'block'}, {'display': 'block'}, [], {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'block'}, [], [], [])
+			return (f"An error occurred: {str(e)}", {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'block'}, [], [], [])
 
 	else:
 		return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
@@ -450,62 +451,71 @@ def process_chr(input_chr):
 	return input_chr, None
 
 # === FUNCTION: Process Variant ===
+def load_AGVs():
+	with gzip.open('files/AGVs_hg38.txt.gz', 'rt') as f:
+		df = pl.read_csv(f, separator='\t', has_header=False, schema_overrides={'column_1': pl.Utf8})
+	df.columns = ['chr', 'pos', 'rsID', 'ref', 'alt']
+	return df
+
+def lookup_AGV_by_chr_pos(df, chr, pos):
+	pos_int = int(pos)
+	filtered = df.filter((pl.col("chr") == chr) & (pl.col("pos") == pos_int))
+	if filtered.height > 0:
+		return filtered.row(0, named=True)
+	return None
+
+def lookup_AGV_by_rsID(df, rsID):
+	filtered = df.filter(pl.col("rsID") == rsID)
+	if filtered.height > 0:
+		return filtered.row(0, named=True)
+	return None
+
+def lookup_chr_for_rsID_external(rsID):
+	pickle_url = 'https://ucsf.box.com/shared/static/qlx2f1ncqgx7kug6kem3p93vbb4ljg8e.pkl'
+	try:
+		response = requests.get(pickle_url, stream=True)
+		response.raise_for_status()
+		with BytesIO(response.content) as compressed_file:
+			with gzip.GzipFile(fileobj=compressed_file) as gz_file:
+				rsID_chr_map = pickle.load(gz_file)
+		return str(rsID_chr_map.get(rsID))
+	except Exception as e:
+		print(f"Error loading rsID to chr lookup: {e}")
+		return None
+
 def process_variant(input_chr=None, input_pos=None, input_rsID=None):
+	df = load_AGVs()
+
 	variant_chr = variant_pos = variant_rsID = variant_ref = variant_alt = None
 	is_AGV = False
 
-	try:
-		with gzip.open('files/AGVs_hg38.txt.gz', 'rt') as f:
-			df = pl.read_csv(f, separator='\t', has_header=False, schema_overrides={'column_1': pl.Utf8})
-		df.columns = ['chr', 'pos', 'rsID', 'ref', 'alt']
+	if input_chr and input_pos:
+		row = lookup_AGV_by_chr_pos(df, input_chr, input_pos)
+		if row:
+			variant_chr = row['chr']
+			variant_pos = row['pos']
+			variant_rsID = row['rsID']
+			variant_ref = row['ref']
+			variant_alt = row['alt']
+			is_AGV = True
+		else:
+			variant_chr = input_chr
+			variant_pos = input_pos
 
-		if input_chr and input_pos:
-			pos_int = int(input_pos)
-			filtered = df.filter((pl.col("chr") == input_chr) & (pl.col("pos") == pos_int))
+	elif input_rsID:
+		row = lookup_AGV_by_rsID(df, input_rsID)
+		if row:
+			variant_chr = row['chr']
+			variant_pos = row['pos']
+			variant_rsID = row['rsID']
+			variant_ref = row['ref']
+			variant_alt = row['alt']
+			is_AGV = True
+		else:
+			variant_chr = lookup_chr_for_rsID_external(input_rsID)
+			variant_rsID = input_rsID
 
-			if filtered.height > 0:
-				row = filtered.row(0, named=True)
-				variant_chr = row["chr"]
-				variant_pos = row["pos"]
-				variant_rsID = row["rsID"]
-				variant_ref = row["ref"]
-				variant_alt = row["alt"]
-				is_AGV = True
-
-		elif input_rsID:
-			filtered = df.filter(pl.col("rsID") == input_rsID)
-
-			if filtered.height > 0:
-				row = filtered.row(0, named=True)
-				variant_chr = row["chr"]
-				variant_pos = row["pos"]
-				variant_rsID = row["rsID"]
-				variant_ref = row["ref"]
-				variant_alt = row["alt"]
-				is_AGV = True
-
-			else:
-				try:
-					pickle_url = 'https://ucsf.box.com/shared/static/qlx2f1ncqgx7kug6kem3p93vbb4ljg8e.pkl'
-					response = requests.get(pickle_url, stream=True)
-					response.raise_for_status()
-
-					with BytesIO(response.content) as compressed_file:
-						with gzip.GzipFile(fileobj=compressed_file) as gz_file:
-							rsID_chr_map = pickle.load(gz_file)
-
-					if input_rsID in rsID_chr_map:
-						variant_chr = str(rsID_chr_map[input_rsID])
-					else:
-						print(f"rsID {input_rsID} not found in TopLD.")
-				except Exception as e:
-					print(f"Error loading rsID to chr lookup: {str(e)}")
-
-		return variant_chr, variant_pos, variant_rsID, variant_ref, variant_alt, is_AGV
-
-	except Exception as e:
-		print(f"General error in process_variant: {e}")
-		return None, None, None, None, None, is_AGV
+	return variant_chr, variant_pos, variant_rsID, variant_ref, variant_alt, is_AGV
 
 # === FUNCTION: Retrieve Genotypes and Calculate Allele Frequencies ===
 def retrieve_GTs_and_calculate_AFs(variant_chr, variant_rsID):
