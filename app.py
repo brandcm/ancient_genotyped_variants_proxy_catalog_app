@@ -376,13 +376,13 @@ def query_AGVs(n_clicks, input_chr, input_pos, input_rsID):
 					message = (f"Variant {input_chr}:{input_pos} is an AGV and LD proxies were found. Both AGV summary results and LD proxies are displayed below." if input_chr and input_pos else f"Variant {input_rsID} is an AGV and LD proxies were found. Both AGV summary results and LD proxies are displayed below.")
 					return (message, {'display': 'block'}, {'display': 'block'}, AGV_data, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, archaic_GTs, {'display': 'block'}, {'display': 'block'}, AFs_summary, all_GTs, sorted_AGV_LDVs.to_dicts())
 				else:
-					message = f"Variant {input_chr}:{input_pos} is an AGV and summary results are displayed below. However, no LD proxies found." if input_chr and input_pos else f"Variant {input_rsID} is an AGV and summary results are displayed below. However, no LD proxies found."
+					message = (f"Variant {input_chr}:{input_pos} is an AGV and summary results are displayed below. However, no LD proxies found." if input_chr and input_pos else f"Variant {input_rsID} is an AGV and summary results are displayed below. However, no LD proxies found.")
 					return (message, {'display': 'block'}, {'display': 'block'}, AGV_data, {'display': 'block'}, {'display': 'block'}, {'display': 'block'}, archaic_GTs, {'display': 'block'}, {'display': 'block'}, AFs_summary, all_GTs, [])
 
 			else:
 				if sorted_AGV_LDVs.height > 0:
-					message = f"Variant {input_chr}:{input_pos} is not an AGV, but LD proxies were found and are displayed below." if input_chr and input_pos else f"Variant {input_rsID} is not an AGV, but LD proxies were found and are displayed below."
-					return ([], {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, [], [], sorted_AGV_LDVs.to_dicts())
+					message = (f"Variant {input_chr}:{input_pos} is not an AGV, but LD proxies were found and are displayed below." if input_chr and input_pos else f"Variant {input_rsID} is not an AGV, but LD proxies were found and are displayed below.")
+					return (message, {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, [], [], sorted_AGV_LDVs.to_dicts())
 
 		except Exception as e:
 			return (f"An error occurred: {str(e)}", {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, [], {'display': 'none'}, {'display': 'block'}, [], [], [])
