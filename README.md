@@ -5,6 +5,7 @@ This repository features a tool that identifies ancient genotyped variants (AGVs
 
 Notes:
 - Two measures of LD are available per variant pair: r-squared and D'.
+- Variant pairs with r-squared < 0.5 are not displayed in the app; however, all variant pairs where r-squared is $\geq$ 0.2 are available in the downloadable bulk data.
 - LD metrics are available for up to four ancestry groups per variant pair: African, East Asian, European, and South Asian.
 - Genomic position for AGV-LD variant pairs use the GRCh38/hg38 reference assembly, whereas ancient genotypes downloaded from the app or retrieved from the VCFs use the GRCh37/hg19 reference assembly.
 <br><br>

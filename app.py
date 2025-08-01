@@ -360,7 +360,7 @@ def query_AGVs(n_clicks, input_chr, input_pos, input_rsID):
 					AGV_LDVs = pl.scan_csv(gz_file, separator='\t', has_header=True, low_memory=True)
 
 					if input_rsID:
-						filtered_AGV_LDVs = AGV_LDVs.filter(pl.col("LDV_rsID") == input_rsID)
+						filtered_AGV_LDVs = AGV_LDVs.filter(pl.col('LDV_rsID') == input_rsID)
 					elif input_chr and input_pos:
 						chr_int = int(input_chr)
 						pos_int = int(input_pos)
@@ -368,7 +368,52 @@ def query_AGVs(n_clicks, input_chr, input_pos, input_rsID):
 					else:
 						return "Unexpected error with input validation.", {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, [], [], []
 
-					sorted_AGV_LDVs = filtered_AGV_LDVs.sort("r2", descending=True).collect()
+					df = filtered_AGV_LDVs.sort('r2', descending=True).collect()
+
+					#sorted_AGV_LDVs = filtered_AGV_LDVs.sort("r2", descending=True).collect() # original code
+
+					# new block that filters out results with r2 <= 0.5
+					sorted_AGV_LDVs = (
+						filtered_AGV_LDVs
+						.sort('r2', descending=True)
+						.collect()
+						.with_columns([
+							pl.col('r2').str.split(',').list.eval(pl.element().cast(pl.Float64)),
+							pl.col('populations').str.split(','),
+							pl.col("D'").str.split(',').list.eval(pl.element().cast(pl.Float64)),
+							pl.col('corr').str.split(',').list.eval(
+								pl.when(pl.element().is_in(["+", "-"]))
+								.then(None)
+								.otherwise(pl.element())
+								.cast(pl.Float64)
+							),
+						])
+						.filter(
+							pl.col('r2').list.eval(pl.element() >= 0.5).list.any()
+						)
+						.with_columns([
+							pl.struct(['populations', 'r2', "D'", 'corr']).map_elements(
+								lambda row: {
+									'populations': [p for r, p in zip(row['r2'], row['populations']) if r >= 0.5],
+									'r2': [r for r in row['r2'] if r >= 0.5],
+									"D'": [d for r, d in zip(row['r2'], row["D'"]) if r >= 0.5],
+									'corr': [c for r, c in zip(row['r2'], row['corr']) if r >= 0.5]
+								},
+								return_dtype=pl.Struct([
+									pl.Field('populations', pl.List(pl.Utf8)),
+									pl.Field('r2', pl.List(pl.Float64)),
+									pl.Field("D'", pl.List(pl.Float64)),
+									pl.Field('corr', pl.List(pl.Float64)),
+								])
+							).struct.unnest()
+						])
+						.with_columns([
+							pl.col("populations").list.join(", ").alias("populations"),
+							pl.col("r2").list.eval(pl.element().cast(pl.Utf8)).list.join(", ").alias("r2"),
+							pl.col("D'").list.eval(pl.element().cast(pl.Utf8)).list.join(", ").alias("D'"),
+							pl.col("corr").list.eval(pl.element().cast(pl.Utf8)).list.join(", ").alias("corr"),
+						])
+					)
 					del AGV_LDVs, filtered_AGV_LDVs
 
 			if is_AGV:
@@ -645,4 +690,5 @@ def compute_AF(df):
 	return AF, non_missing_GTs.height
 
 if __name__ == "__main__":
-	app.run(debug=False)
+#	app.run(debug=False)
+	app.run(debug=True)
